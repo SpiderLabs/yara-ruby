@@ -31,7 +31,7 @@ Jeweler::Tasks.new do |gem|
 end
 Jeweler::RubygemsDotOrgTasks.new
 
-Rake::ExtensionTask.new("yara_c")
+Rake::ExtensionTask.new("yara_native")
 
 CLEAN.include("lib/*.bundle")
 CLEAN.include("lib/*.so")

@@ -1,7 +1,7 @@
 require 'mkmf'
 require 'rbconfig'
 
-extension_name = "yara_c"
+extension_name = "yara_native"
 
 dir_config(extension_name)
 
