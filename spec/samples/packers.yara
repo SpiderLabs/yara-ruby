@@ -95,7 +95,7 @@ rule FSG
 }
 
 
-rule UPX 
+rule UPX : packer compression shady
 {
     strings:
     
