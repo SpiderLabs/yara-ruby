@@ -3,14 +3,15 @@ require 'yara_native'
 
 module Yara
   class Rules
-    class Match
-    end
+  end
 
-    class MatchString
+  class Match
+  end
 
-      def <=>(other)
-        self.offset <=> other.offset
-      end
+  class MatchString
+
+    def <=>(other)
+      self.offset <=> other.offset
     end
   end
 

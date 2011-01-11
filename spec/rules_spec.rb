@@ -36,13 +36,13 @@ describe Yara::Rules do
     end
 
     it "should raise an error if compiling a file with bad syntax" do
-      lambda { @rules.compile_file(__FILE__) }.should raise_error(Yara::Rules::CompileError)
+      lambda { @rules.compile_file(__FILE__) }.should raise_error(Yara::CompileError)
       @rules.weight.should == 0
     end
 
     it "should raise an error if duplicate file data is compiled" do
       lambda { @rules.compile_file(sample_file("upx.yara")) }.should_not raise_error
-      lambda { @rules.compile_file(sample_file("upx.yara")) }.should raise_error(Yara::Rules::CompileError)
+      lambda { @rules.compile_file(sample_file("upx.yara")) }.should raise_error(Yara::CompileError)
       @rules.weight.should > 0
     end
 
@@ -59,14 +59,14 @@ describe Yara::Rules do
 
     it "should raise an error if compiling a string with bad syntax" do
       rules = File.read(sample_file("upx.yara")) << "some bogus stuff\n"
-      lambda { @rules.compile_string(rules) }.should raise_error(Yara::Rules::CompileError)
+      lambda { @rules.compile_string(rules) }.should raise_error(Yara::CompileError)
       @rules.weight.should > 0 # it parsed everything up to the error
     end
 
     it "should raise an error if duplicate string data is compiled" do
       rules = File.read(sample_file("upx.yara"))
       lambda { @rules.compile_string(rules) }.should_not raise_error
-      lambda { @rules.compile_string(rules) }.should raise_error(Yara::Rules::CompileError)
+      lambda { @rules.compile_string(rules) }.should raise_error(Yara::CompileError)
       @rules.weight.should > 0
     end
 
@@ -115,7 +115,7 @@ describe Yara::Rules do
       results.should be_kind_of(Array)
       results.size.should == 1
       m = results.first
-      m.should be_kind_of(Yara::Rules::Match)
+      m.should be_kind_of(Yara::Match)
       m.should be_frozen
 
       m.rule.should == "UPX"
@@ -130,6 +130,7 @@ describe Yara::Rules do
 
       strings = m.strings.sort
       strings.each do |ms| 
+        ms.should be_kind_of(Yara::MatchString)
         ms.identifier.should be_frozen
         ms.buffer.should be_frozen
       end
@@ -146,7 +147,7 @@ describe Yara::Rules do
     it "should raise an error if scanning an invalid file" do
       @rules.compile_file(sample_file("packers.yara"))
       @rules.weight.should > 0
-      lambda { @rules.scan_file(sample_file("not a real file at all")) }.should raise_error(Yara::Rules::ScanError)
+      lambda { @rules.scan_file(sample_file("not a real file at all")) }.should raise_error(Yara::ScanError)
       lambda { @rules.scan_file(Object.new)}.should raise_error(TypeError)
       lambda { @rules.scan_file(nil)}.should raise_error(TypeError)
     end
@@ -154,7 +155,7 @@ describe Yara::Rules do
     it "should raise an error if scanning a zero-length file" do
       @rules.compile_file(sample_file("packers.yara"))
       @rules.weight.should > 0
-      lambda { @rules.scan_file("/dev/null")}.should raise_error(Yara::Rules::ScanError)
+      lambda { @rules.scan_file("/dev/null")}.should raise_error(Yara::ScanError)
     end
 
     it "should scan a string" do
@@ -164,7 +165,7 @@ describe Yara::Rules do
       results.should be_kind_of(Array)
       results.size.should == 1
       m = results.first
-      m.should be_kind_of(Yara::Rules::Match)
+      m.should be_kind_of(Yara::Match)
       m.should be_frozen
 
       m.rule.should == "UPX"
@@ -180,6 +181,7 @@ describe Yara::Rules do
       m.strings.should be_frozen
       strings = m.strings.sort
       strings.each do |ms| 
+        ms.should be_kind_of(Yara::MatchString)
         ms.identifier.should be_frozen
         ms.buffer.should be_frozen
       end
