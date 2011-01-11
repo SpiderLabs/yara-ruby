@@ -1,8 +1,11 @@
 #include "Rules.h"
+#include "Match.h"
 #include <stdio.h>
 
 static VALUE class_Rules = Qnil;
+
 static VALUE error_CompileError = Qnil;
+static VALUE error_ScanError = Qnil;
 
 void rules_mark(YARA_CONTEXT *ctx) { }
 
@@ -17,27 +20,27 @@ VALUE rules_allocate(VALUE klass) {
 }
 
 VALUE rules_compile_file(VALUE self, VALUE rb_fname) {
-  FILE * f;
+  FILE * file;
   char * fname;
   YARA_CONTEXT *ctx;
   char error_message[256];
 
   Check_Type(rb_fname, T_STRING);
-  fname = rb_str2cstr(rb_fname, NULL);
+  fname = RSTRING_PTR(rb_fname);
 
-  if( !(f=fopen(fname, "r")) ) {
+  if( !(file=fopen(fname, "r")) ) {
     rb_raise(error_CompileError, "No such file: %s", fname);
   } else {
     Data_Get_Struct(self, YARA_CONTEXT, ctx);
 
-    if( yr_compile_file(f, ctx) != 0 ) {
+    if( yr_compile_file(file, ctx) != 0 ) {
       yr_get_error_message(ctx, error_message, sizeof(error_message));
-      fclose(f);
+      fclose(file);
       rb_raise(error_CompileError, "Syntax Error - %s(%d): %s", fname, ctx->last_error_line, error_message);
     }
 
     yr_push_file_name(ctx, fname);
-    fclose(f);
+    fclose(file);
     return Qtrue;
   }
 }
@@ -48,7 +51,7 @@ VALUE rules_compile_string(VALUE self, VALUE rb_rules) {
   char error_message[256];
 
   Check_Type(rb_rules, T_STRING);
-  rules = rb_str2cstr(rb_rules, NULL);
+  rules = RSTRING_PTR(rb_rules);
   Data_Get_Struct(self, YARA_CONTEXT, ctx);
 
   if( yr_compile_string(rules, ctx) != 0) {
@@ -79,14 +82,12 @@ VALUE rules_namespaces(VALUE self) {
   YARA_CONTEXT *ctx;
   NAMESPACE *ns;
   VALUE ary = rb_ary_new();
-  long unsigned int i = 0;
 
   Data_Get_Struct(self, YARA_CONTEXT, ctx);
   ns = ctx->namespaces;
   while(ns && ns->name) {
-    rb_ary_store(ary, i, rb_str_new2(ns->name));
+    rb_ary_push(ary, rb_str_new2(ns->name));
     ns = ns->next;
-    i++;
   }
   return ary;
 }
@@ -109,7 +110,7 @@ VALUE rules_set_namespace(VALUE self, VALUE rb_namespace) {
   const char *name;
 
   Check_Type(rb_namespace, T_STRING);
-  name = rb_str2cstr(rb_namespace, NULL);
+  name = RSTRING_PTR(rb_namespace);
 
   Data_Get_Struct(self, YARA_CONTEXT, ctx);
 
@@ -125,11 +126,69 @@ VALUE rules_set_namespace(VALUE self, VALUE rb_namespace) {
 
 }
 
-void init_rules(VALUE mod) {
-  class_Rules = rb_define_class_under(mod, "Rules", rb_cObject);
-  rb_define_alloc_func(class_Rules, rules_allocate);
+static int 
+scan_callback(RULE *rule, unsigned char *buffer, unsigned int buffer_size, void *data) {
+  int match_ret;
+  VALUE match = Qnil;
+  VALUE results = *((VALUE *) data);
 
-  error_CompileError = rb_define_class_under(class_Rules, "CompileError", rb_eStandardError);
+  Check_Type(results, T_ARRAY);
+
+  match_ret = Match_NEW_from_rule(rule, buffer, &match);
+  if(match_ret == 0 && !NIL_P(match))
+    rb_ary_push(results,match);
+
+  return match_ret;
+}
+
+
+VALUE rules_scan_file(VALUE self, VALUE rb_fname) {
+  YARA_CONTEXT *ctx;
+  VALUE results;
+  unsigned int ret;
+  char *fname;
+
+  Check_Type(rb_fname, T_STRING);
+  results = rb_ary_new();
+  Data_Get_Struct(self, YARA_CONTEXT, ctx);
+  fname = RSTRING_PTR(rb_fname);
+
+  ret = yr_scan_file(fname, ctx, scan_callback, &results);
+  if (ret == ERROR_COULD_NOT_OPEN_FILE)
+    rb_raise(error_ScanError, "Could not open file: '%s'", fname);
+  else if (ret != 0)
+    rb_raise(error_ScanError, "A error occurred while scanning: %s", 
+        ((ret > MAX_SCAN_ERROR)? "unknown error" : SCAN_ERRORS[ret]));
+
+  return results;
+}
+
+VALUE rules_scan_string(VALUE self, VALUE rb_dat) {
+  YARA_CONTEXT *ctx;
+  VALUE results;
+  char *buf;
+  long buflen;
+  int ret;
+
+  Check_Type(rb_dat, T_STRING);
+  buf = RSTRING_PTR(rb_dat);
+  buflen = RSTRING_LEN(rb_dat);
+
+  results = rb_ary_new();
+
+  Data_Get_Struct(self, YARA_CONTEXT, ctx);
+
+  ret = yr_scan_mem(buf, buflen, ctx, scan_callback, &results);
+  if (ret != 0)
+    rb_raise(error_ScanError, "A error occurred while scanning: %s", 
+        ((ret > MAX_SCAN_ERROR)? "unknown error" : SCAN_ERRORS[ret]));
+
+  return results;
+}
+
+void init_rules(VALUE rb_ns) {
+  class_Rules = rb_define_class_under(rb_ns, "Rules", rb_cObject);
+  rb_define_alloc_func(class_Rules, rules_allocate);
 
   rb_define_method(class_Rules, "compile_file", rules_compile_file, 1);
   rb_define_method(class_Rules, "compile_string", rules_compile_string, 1);
@@ -137,5 +196,12 @@ void init_rules(VALUE mod) {
   rb_define_method(class_Rules, "current_namespace", rules_current_namespace, 0);
   rb_define_method(class_Rules, "namespaces", rules_namespaces, 0);
   rb_define_method(class_Rules, "set_namespace", rules_set_namespace, 1);
+  rb_define_method(class_Rules, "scan_file", rules_scan_file, 1);
+  rb_define_method(class_Rules, "scan_string", rules_scan_string, 1);
 
+  error_CompileError = rb_define_class_under(class_Rules, "CompileError", rb_eStandardError);
+  error_ScanError = rb_define_class_under(class_Rules, "ScanError", rb_eStandardError);
+
+  init_match(class_Rules);
 }
+
