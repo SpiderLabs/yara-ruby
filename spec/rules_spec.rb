@@ -19,20 +19,25 @@ describe Yara::Rules do
       @rules.weight.should == 0
     end
 
-    it "should have a compile_file method" do
-      @rules.should be_respond_to(:compile_file)
-    end
-
     it "should compile a file" do
       lambda { @rules.compile_file(sample_file("upx.yara")) }.should_not raise_error
+      @rules.weight.should > 0
     end
+
+    it "should compile an empty file" do
+      lambda { @rules.compile_file("/dev/null") }.should_not raise_error
+      @rules.weight.should == 0
+    end
+
 
     it "should raise an error when compiling an invalid filename" do
       lambda { @rules.compile_file("so totally bogus a file") }.should raise_error
+      @rules.weight.should == 0
     end
 
     it "should raise an error when compiling a file with bad syntax" do
       lambda { @rules.compile_file(__FILE__) }.should raise_error(Yara::Rules::CompileError)
+      @rules.weight.should == 0
     end
 
     it "should raise an error when duplicate file data is compiled" do
@@ -41,16 +46,15 @@ describe Yara::Rules do
       @rules.weight.should > 0
     end
 
-    it "should have a compile_string method" do
-      @rules.should be_respond_to(:compile_string)
-      lambda { @rules.compile_string("") }.should_not raise_error
-      @rules.weight.should == 0
-    end
-
     it "should compile a string" do
       rules = File.read(sample_file("upx.yara"))
       lambda { @rules.compile_string(rules) }.should_not raise_error
       @rules.weight.should > 0
+    end
+
+    it "should compile an empty string" do
+      lambda { @rules.compile_string("") }.should_not raise_error
+      @rules.weight.should == 0
     end
 
     it "should raise an error when compiling a string with bad syntax" do
