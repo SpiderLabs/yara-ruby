@@ -7,6 +7,11 @@ require 'yara'
 # in ./support/ and its subdirectories.
 Dir["#{File.dirname(__FILE__)}/support/**/*.rb"].each {|f| require f}
 
+
+def sample_file(fname)
+  File.join(File.dirname(__FILE__), "samples", fname)
+end
+
 RSpec.configure do |config|
   
 end
