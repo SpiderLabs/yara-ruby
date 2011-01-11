@@ -1,32 +1,8 @@
 #include "Rules.h"
 #include <stdio.h>
 
-VALUE rules_allocate(VALUE klass);
-VALUE rules_compile_file(VALUE self, VALUE fname);
-VALUE rules_compile_string(VALUE self, VALUE string);
-VALUE rules_weight(VALUE self);
-VALUE rules_current_namespace(VALUE self);
-VALUE rules_namespaces(VALUE self);
-VALUE rules_set_namespace(VALUE self, VALUE name);
-
 static VALUE class_Rules = Qnil;
-
-VALUE error_CompileError = Qnil;
-
-void init_rules(VALUE mod) {
-  class_Rules = rb_define_class_under(mod, "Rules", rb_cObject);
-  rb_define_alloc_func(class_Rules, rules_allocate);
-
-  error_CompileError = rb_define_class_under(class_Rules, "CompileError", rb_eStandardError);
-
-  rb_define_method(class_Rules, "compile_file", rules_compile_file, 1);
-  rb_define_method(class_Rules, "compile_string", rules_compile_string, 1);
-  rb_define_method(class_Rules, "weight", rules_weight, 0);
-  rb_define_method(class_Rules, "current_namespace", rules_current_namespace, 0);
-  rb_define_method(class_Rules, "namespaces", rules_namespaces, 0);
-  rb_define_method(class_Rules, "set_namespace", rules_set_namespace, 1);
-
-}
+static VALUE error_CompileError = Qnil;
 
 void rules_mark(YARA_CONTEXT *ctx) { }
 
@@ -60,9 +36,10 @@ VALUE rules_compile_file(VALUE self, VALUE rb_fname) {
       rb_raise(error_CompileError, "Syntax Error - %s(%d): %s", fname, ctx->last_error_line, error_message);
     }
 
+    yr_push_file_name(ctx, fname);
     fclose(f);
+    return Qtrue;
   }
-  return Qnil;
 }
 
 VALUE rules_compile_string(VALUE self, VALUE rb_rules) {
@@ -79,7 +56,7 @@ VALUE rules_compile_string(VALUE self, VALUE rb_rules) {
       rb_raise(error_CompileError, "Syntax Error - line(%d): %s", ctx->last_error_line, error_message);
   }
 
-  return Qnil;
+  return Qtrue;
 }
 
 VALUE rules_weight(VALUE self) {
@@ -145,5 +122,20 @@ VALUE rules_set_namespace(VALUE self, VALUE rb_namespace) {
   } else {
     return Qnil;
   }
+
+}
+
+void init_rules(VALUE mod) {
+  class_Rules = rb_define_class_under(mod, "Rules", rb_cObject);
+  rb_define_alloc_func(class_Rules, rules_allocate);
+
+  error_CompileError = rb_define_class_under(class_Rules, "CompileError", rb_eStandardError);
+
+  rb_define_method(class_Rules, "compile_file", rules_compile_file, 1);
+  rb_define_method(class_Rules, "compile_string", rules_compile_string, 1);
+  rb_define_method(class_Rules, "weight", rules_weight, 0);
+  rb_define_method(class_Rules, "current_namespace", rules_current_namespace, 0);
+  rb_define_method(class_Rules, "namespaces", rules_namespaces, 0);
+  rb_define_method(class_Rules, "set_namespace", rules_set_namespace, 1);
 
 }
