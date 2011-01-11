@@ -42,3 +42,7 @@ pkg
 #*.swp
 .gitignore
 ref
+*.so
+*.bundle
+tmp
+*.lock
