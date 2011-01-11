@@ -66,5 +66,42 @@ describe Yara::Rules do
       @rules.weight.should > 0
     end
 
+    it "should indicate the current namespace" do
+      @rules.current_namespace.should be_kind_of(String)
+      @rules.current_namespace.should == "default"
+    end
+
+    it "should indicate all known namespaces" do
+      @rules.namespaces.should be_kind_of(Array)
+      @rules.namespaces.should == ["default"]
+    end
+
+    it "should support setting a new namespace" do
+      @rules.namespaces.should be_kind_of(Array)
+      @rules.namespaces.should == ["default"]
+
+      @rules.set_namespace("a_new_namespace").should == "a_new_namespace"
+      @rules.current_namespace.should == "a_new_namespace"
+      @rules.namespaces.should be_kind_of(Array)
+      @rules.namespaces.should == ["a_new_namespace", "default"]
+    end
+
+    it "should not create duplicate namespaces" do
+      @rules.namespaces.should be_kind_of(Array)
+      @rules.namespaces.should == ["default"]
+
+      @rules.set_namespace("a_new_namespace").should == "a_new_namespace"
+      @rules.current_namespace.should == "a_new_namespace"
+      @rules.namespaces.should be_kind_of(Array)
+      @rules.namespaces.should == ["a_new_namespace", "default"]
+
+      @rules.set_namespace("default").should == "default"
+      @rules.current_namespace.should == "default"
+      @rules.namespaces.should == ["a_new_namespace", "default"]
+
+      @rules.set_namespace("a_new_namespace").should == "a_new_namespace"
+      @rules.current_namespace.should == "a_new_namespace"
+      @rules.namespaces.should == ["a_new_namespace", "default"]
+    end
   end
 end

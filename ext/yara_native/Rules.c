@@ -2,9 +2,12 @@
 #include <stdio.h>
 
 VALUE rules_allocate(VALUE klass);
-VALUE rules_compile_file(VALUE self, VALUE object);
-VALUE rules_compile_string(VALUE self, VALUE object);
+VALUE rules_compile_file(VALUE self, VALUE fname);
+VALUE rules_compile_string(VALUE self, VALUE string);
 VALUE rules_weight(VALUE self);
+VALUE rules_current_namespace(VALUE self);
+VALUE rules_namespaces(VALUE self);
+VALUE rules_set_namespace(VALUE self, VALUE name);
 
 static VALUE class_Rules = Qnil;
 
@@ -19,6 +22,9 @@ void init_rules(VALUE mod) {
   rb_define_method(class_Rules, "compile_file", rules_compile_file, 1);
   rb_define_method(class_Rules, "compile_string", rules_compile_string, 1);
   rb_define_method(class_Rules, "weight", rules_weight, 0);
+  rb_define_method(class_Rules, "current_namespace", rules_current_namespace, 0);
+  rb_define_method(class_Rules, "namespaces", rules_namespaces, 0);
+  rb_define_method(class_Rules, "set_namespace", rules_set_namespace, 1);
 
 }
 
@@ -64,7 +70,7 @@ VALUE rules_compile_string(VALUE self, VALUE rb_rules) {
   char *rules;
   char error_message[256];
 
-  Check_Type (rb_rules, T_STRING);
+  Check_Type(rb_rules, T_STRING);
   rules = rb_str2cstr(rb_rules, NULL);
   Data_Get_Struct(self, YARA_CONTEXT, ctx);
 
@@ -82,3 +88,62 @@ VALUE rules_weight(VALUE self) {
   return INT2NUM(yr_calculate_rules_weight(ctx));
 }
 
+
+VALUE rules_current_namespace(VALUE self) {
+  YARA_CONTEXT *ctx;
+  Data_Get_Struct(self, YARA_CONTEXT, ctx);
+  if(ctx->current_namespace && ctx->current_namespace->name)
+    return rb_str_new2(ctx->current_namespace->name);
+  else
+    return Qnil;
+}
+
+VALUE rules_namespaces(VALUE self) {
+  YARA_CONTEXT *ctx;
+  NAMESPACE *ns;
+  VALUE ary = rb_ary_new();
+  long unsigned int i = 0;
+
+  Data_Get_Struct(self, YARA_CONTEXT, ctx);
+  ns = ctx->namespaces;
+  while(ns && ns->name) {
+    rb_ary_store(ary, i, rb_str_new2(ns->name));
+    ns = ns->next;
+    i++;
+  }
+  return ary;
+}
+
+NAMESPACE * find_namespace(YARA_CONTEXT *ctx, const char *name) {
+  NAMESPACE *ns = ctx->namespaces;
+
+  while(ns && ns->name) {
+    if(strcmp(name, ns->name) == 0)
+      return(ns);
+    else
+      ns = ns->next;
+  }
+  return (NAMESPACE*) NULL;
+}
+
+VALUE rules_set_namespace(VALUE self, VALUE rb_namespace) {
+  YARA_CONTEXT *ctx;
+  NAMESPACE *ns = NULL;
+  const char *name;
+
+  Check_Type(rb_namespace, T_STRING);
+  name = rb_str2cstr(rb_namespace, NULL);
+
+  Data_Get_Struct(self, YARA_CONTEXT, ctx);
+
+  if (!(ns = find_namespace(ctx, name)))
+      ns = yr_create_namespace(ctx, name);
+
+  if (ns) {
+    ctx->current_namespace = ns;
+    return rb_namespace;
+  } else {
+    return Qnil;
+  }
+
+}
