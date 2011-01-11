@@ -17,8 +17,8 @@ Jeweler::Tasks.new do |gem|
   gem.name = "yara"
   gem.homepage = "http://github.com/emonti/yara-ruby"
   gem.license = "MIT"
-  gem.summary = %Q{TODO: one-line summary of your gem}
-  gem.description = %Q{TODO: longer description of your gem}
+  gem.summary = %Q{Ruby Bindings for libyara}
+  gem.description = %Q{Ruby Bindings for the yara malware analysis library}
   gem.email = "esmonti@gmail.com"
   gem.authors = ["Eric Monti"]
 

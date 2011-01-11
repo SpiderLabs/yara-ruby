@@ -21,7 +21,6 @@ See http://code.google.com/p/yara-project for more information.
 
   Dir["**/*", "*"].each do |fname|
     begin
-      puts fname
       next unless File.file?(fname)
       ctx.scan_file(fname).each {|match| puts "#{fname} -> #{match.rule}" }
     rescue Yara::ScanError => e
