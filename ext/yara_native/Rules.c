@@ -1,11 +1,9 @@
+#include "errors.h"
 #include "Rules.h"
 #include "Match.h"
 #include <stdio.h>
 
 static VALUE class_Rules = Qnil;
-
-static VALUE error_CompileError = Qnil;
-static VALUE error_ScanError = Qnil;
 
 void rules_mark(YARA_CONTEXT *ctx) { }
 
@@ -187,6 +185,7 @@ VALUE rules_scan_string(VALUE self, VALUE rb_dat) {
 }
 
 void init_rules(VALUE rb_ns) {
+
   class_Rules = rb_define_class_under(rb_ns, "Rules", rb_cObject);
   rb_define_alloc_func(class_Rules, rules_allocate);
 
@@ -199,9 +198,6 @@ void init_rules(VALUE rb_ns) {
   rb_define_method(class_Rules, "scan_file", rules_scan_file, 1);
   rb_define_method(class_Rules, "scan_string", rules_scan_string, 1);
 
-  error_CompileError = rb_define_class_under(class_Rules, "CompileError", rb_eStandardError);
-  error_ScanError = rb_define_class_under(class_Rules, "ScanError", rb_eStandardError);
-
-  init_match(class_Rules);
+  init_match(rb_ns);
 }
 

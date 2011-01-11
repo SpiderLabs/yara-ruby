@@ -6,7 +6,6 @@
 #include "ruby.h"
 
 static VALUE class_Rules;
-static VALUE error_CompileError;
 
 void init_rules(VALUE ruby_namespace);
 

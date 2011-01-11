@@ -4,13 +4,13 @@
 #include "ruby.h"
 #include <yara.h>
 
-static VALUE class_Match;
-static VALUE class_MatchString;
+extern VALUE class_Match;
+extern VALUE class_MatchString;
 
-void 
+extern void 
 init_match(VALUE ruby_namespace);
 
-int
+extern int
 Match_NEW_from_rule(RULE * rule, unsigned char * buffer, VALUE * match);
 
 extern const char * SCAN_ERRORS[];

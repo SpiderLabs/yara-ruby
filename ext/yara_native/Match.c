@@ -2,6 +2,9 @@
 #include <strings.h>
 #include <stdlib.h>
 
+VALUE class_Match = Qnil;
+VALUE class_MatchString = Qnil;
+
 const char * SCAN_ERRORS[] = {
   NULL,
   "insuficient memory",
