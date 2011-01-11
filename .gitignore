@@ -46,3 +46,4 @@ ref
 *.bundle
 tmp
 *.lock
+*.gemspec
