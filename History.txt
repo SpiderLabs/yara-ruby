@@ -1,3 +1,6 @@
+== 1.4.1 / 2011-01-11
+  * Official initial release 
+
 == 1.4.0 / 2011-01-11
   * Initial version published. C bindings are based on yara v1.4.0.
 
