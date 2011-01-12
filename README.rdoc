@@ -36,6 +36,11 @@ to be in step with the C api version.
 == Requirements
 * libyara 1.4 must be installed - http://code.google.com/p/yara-project/
 
+== Installation
+
+Assuming you have already installed yara and have libyara and yara.h somewhere in your search paths,
+you should be able to simply 'gem install yara' or "rake compile" from the package dir.
+
 == Copyright
 
 Copyright (c) 2011 Eric Monti. See LICENSE.txt for
