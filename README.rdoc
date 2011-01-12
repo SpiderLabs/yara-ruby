@@ -29,11 +29,9 @@ See http://code.google.com/p/yara-project for more information.
   end
 
 == Versioning
-The current version is 1.4.0. The major and minor version numbers are intended
-to indicate the version of the yara library the bindings are written for. 
-
-We may use the patch version to maintain our own patches or new features, 
-however.
+The current version is of libyara at the time of writing 1.4.0. 
+The major and minor version numbers of the ruby library are intended
+to be in step with the C api version.
 
 == Requirements
 * libyara 1.4 must be installed - http://code.google.com/p/yara-project/
