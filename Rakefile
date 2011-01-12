@@ -15,11 +15,10 @@ require 'jeweler'
 Jeweler::Tasks.new do |gem|
   # gem is a Gem::Specification... see http://docs.rubygems.org/read/chapter/20 for more options
   gem.name = "yara"
-  gem.homepage = "http://github.com/emonti/yara-ruby"
-  gem.license = "MIT"
+  gem.homepage = "http://github.com/SpiderLabs/yara-ruby"
   gem.summary = %Q{Ruby Bindings for libyara}
   gem.description = %Q{Ruby Bindings for the yara malware analysis library}
-  gem.email = "esmonti@gmail.com"
+  gem.email = "emonti@trustwave.com"
   gem.authors = ["Eric Monti"]
 
   gem.extensions = FileList['ext/**/extconf.rb']
