@@ -66,7 +66,7 @@ MatchString_NEW(int offset, char *ident, char *buf, size_t buflen) {
   ms->identifier  = rb_obj_freeze(rb_str_new2(ident));
   ms->buffer      = rb_obj_freeze(rb_str_new(buf, buflen));
 
-  return rb_obj_freeze(Data_Wrap_Struct(class_MatchString, 0, 0, ms));
+  return rb_obj_freeze(Data_Wrap_Struct(class_MatchString, 0, free, ms));
 }
 
 int 
@@ -119,7 +119,7 @@ Match_NEW_from_rule(RULE *rule, unsigned char *buffer, VALUE *match) {
   }
   rb_obj_freeze(mi->meta);
 
-  *(match) = rb_obj_freeze(Data_Wrap_Struct(class_Match, 0, 0, mi));
+  *(match) = rb_obj_freeze(Data_Wrap_Struct(class_Match, 0, free, mi));
 
   return 0;
 }
