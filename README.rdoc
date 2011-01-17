@@ -29,7 +29,10 @@ See http://code.google.com/p/yara-project for more information.
   end
 
 == Versioning
-The current version is of libyara at the time of writing 1.4.0. 
+The current version of libyara at the time of writing is 1.4.0. Bindings
+have been written against this API and may not work with earlier versions
+of the libyara library.
+
 The major and minor version numbers of the ruby library are intended
 to be in step with the C api version.
 
@@ -38,11 +41,37 @@ to be in step with the C api version.
 
 == Installation
 
-Assuming you have already installed yara and have libyara and yara.h somewhere in your search paths,
-you should be able to simply 'gem install yara' or "rake compile" from the package dir.
+First make sure you have libyara and its dependencies installed. You'll need
+libyara and yara.h in your search paths.
+
+Install the yara ruby package from a gem:
+
+    (sudo)? gem install yara
+
+Or from the github package.
+
+    git clone https://github.com/emonti/yara-ruby.git
+    cd yara-ruby
+    rake compile
+
 
 == Copyright
 
-Copyright (c) 2011 Eric Monti. See LICENSE.txt for
-further details.
+yara-ruby - Ruby bindings for the yara malware analysis library.
+Eric Monti
+Copyright (C) 2011 Trustwave
 
+This program is free software: you can redistribute it and/or modify it 
+under the terms of the GNU General Public License as published by the 
+Free Software Foundation, either version 3 of the License, or (at your
+option) any later version.
+
+This program is distributed in the hope that it will be useful, but 
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License along
+with this program. If not, see <http://www.gnu.org/licenses/>.
+
+See LICENSE.txt
