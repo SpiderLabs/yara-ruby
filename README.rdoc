@@ -1,4 +1,8 @@
 = yara
+Eric Monti
+emonti at trustwave dot com
+
+== Introduction
 
 Ruby bindings for the yara malware analysis library.
 
@@ -10,7 +14,7 @@ expression which determines the rule logic.
 
 See http://code.google.com/p/yara-project for more information.
 
-== Synopsis
+== Usage
 
   # basic example... find all PE files under the current dir
 
