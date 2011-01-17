@@ -1,6 +1,5 @@
 = yara
-Eric Monti
-emonti at trustwave dot com
+Eric Monti - emonti at trustwave dot com
 
 == Introduction
 
