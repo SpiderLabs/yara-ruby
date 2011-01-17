@@ -1,0 +1,58 @@
+#!/usr/bin/env ruby
+# Simple yara-ruby script to extract RSA private keys and certificates
+# based on http://www.trapkit.de/research/sslkeyfinder
+# and http://www.kyprizel.net/work/ida/getkeys.py
+#
+# Eric Monti - Jan 17 2011
+
+$: << File.join(File.dirname(__FILE__), '..', 'lib')
+require 'yara'
+require 'pp'
+
+ctx = Yara::Rules.new
+ctx.compile_string <<_EOF_
+rule x509_public_key_infrastructure_cert
+{
+  meta:
+    desc = "X.509 PKI Certificate"
+    ext = "crt"
+  strings: $a = {30 82 ?? ?? 30 82 ?? ??}
+  condition: $a
+}
+
+rule pkcs8_private_key_information_syntax_standard
+{
+  meta:
+    desc = "Found PKCS #8: Private-Key"
+    ext = "key"
+
+  strings: $a = {30 82 ?? ?? 02 01 00}
+  condition: $a
+}
+_EOF_
+
+
+ARGV.each do |fname|
+  begin
+    file = File.new(fname, 'rb')
+    ctx.scan_file(fname).each do |match|
+      match.strings.each do |string|
+        file.pos = string.offset
+        hdr = file.read(4)
+        magic, len = hdr.unpack("nn")
+
+        next unless magic == 0x3082
+
+        outf = "#{fname}_%0.8x.#{match.meta['ext']}" % string.offset
+        STDERR.puts "Found #{match.meta['desc']} in #{fname.inspect} - writing to #{outf.inspect}"
+
+        File.open(outf, 'wb') do |out|
+          out.write hdr 
+          out.write file.read(len)
+        end
+      end
+    end
+  ensure
+    file.close
+  end
+end
