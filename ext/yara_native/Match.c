@@ -124,7 +124,11 @@ Match_NEW_from_rule(RULE *rule, unsigned char *buffer, VALUE *match) {
     if (string->flags & STRING_FLAGS_FOUND) {
       m = string->matches;
       while (m) {
-       rb_ary_push(mi->strings, MatchString_NEW(m->offset, string->identifier, buffer + m->offset, m->length));
+       rb_ary_push(mi->strings, 
+           MatchString_NEW(m->offset, 
+             string->identifier, 
+             buffer + m->offset, 
+             m->length));
         m = m->next;
       }
     }
@@ -134,7 +138,22 @@ Match_NEW_from_rule(RULE *rule, unsigned char *buffer, VALUE *match) {
 
   meta = rule->meta_list_head;
   while(meta) {
-    // ... TODO
+    if (meta->type == META_TYPE_INTEGER) {
+      rb_hash_aset(mi->meta, 
+          rb_str_new2(meta->identifier), 
+          INT2NUM(meta->integer));
+    }
+    else if (meta->type == META_TYPE_BOOLEAN) {
+      rb_hash_aset(mi->meta, 
+          rb_str_new2(meta->identifier), 
+          ((meta->boolean) ? Qtrue : Qfalse));
+    }
+    else {
+      rb_hash_aset(mi->meta, 
+          rb_str_new2(meta->identifier), 
+          rb_obj_freeze(rb_str_new2(meta->string)));
+    }
+
     meta = meta->next;
   }
   rb_obj_freeze(mi->meta);
