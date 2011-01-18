@@ -53,6 +53,6 @@ ARGV.each do |fname|
       end
     end
   ensure
-    file.close
+    file.close if file
   end
 end
