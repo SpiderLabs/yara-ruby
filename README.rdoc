@@ -11,7 +11,9 @@ based on textual or binary information contained on samples of those families.
 These descriptions, named rules, consist of a set of strings and a Boolean
 expression which determines the rule logic.
 
-See http://code.google.com/p/yara-project for more information.
+Yara and it's code are copyrights of Victor M. Alvarez. Please see
+http://code.google.com/p/yara-project/
+
 
 == Usage
 
@@ -59,7 +61,6 @@ Or from the github package.
 
 
 == Copyright
-
 yara-ruby - Ruby bindings for the yara malware analysis library.
 Eric Monti
 Copyright (C) 2011 Trustwave
