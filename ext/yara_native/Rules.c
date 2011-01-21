@@ -1,7 +1,7 @@
 /*
  *  yara-ruby - Ruby bindings for the yara malware analysis library.
  *  Eric Monti
- *  Copyright (C) 2011 Trustwave
+ *  Copyright (C) 2011 Trustwave Holdings
  *  
  *  This program is free software: you can redistribute it and/or modify it 
  *  under the terms of the GNU General Public License as published by the 
