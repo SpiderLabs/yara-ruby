@@ -282,8 +282,8 @@ init_Match() {
 /*
  * Document-class:  Match
  *
- * Encapsulates a match object returned from Yara::Rules#scan_string or Yara::Rules#scan_file.
- * A Match contains one or more MatchString objects.
+ * Encapsulates a match object returned from Yara::Rules#scan_string or 
+ * Yara::Rules#scan_file. A Match contains one or more MatchString objects.
  */
   class_Match = rb_define_class_under(module_Yara, "Match", rb_cObject);
   rb_define_method(class_Match, "rule", match_rule, 0);
