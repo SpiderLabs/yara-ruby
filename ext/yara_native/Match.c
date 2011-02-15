@@ -163,7 +163,10 @@ Match_NEW_from_rule(RULE *rule, unsigned char *buffer, VALUE *match) {
   return 0;
 }
 
-/* call-seq:
+/* 
+ * Document-method: rule
+ *
+ * call-seq:
  *      match.rule() -> String
  *
  * Returns the rule identifier string for this match.
@@ -174,7 +177,10 @@ static VALUE match_rule(VALUE self) {
   return mi->rule;
 }
 
-/* call-seq:
+/* 
+ * Document-method: namespace
+ *
+ * call-seq:
  *      match.namespace() -> String
  *
  * Returns the namespace for this match.
@@ -185,7 +191,10 @@ static VALUE match_namespace(VALUE self) {
   return mi->namespace;
 }
 
-/* call-seq:
+/* 
+ * Document-method: tags
+ *
+ * call-seq:
  *      match.tags() -> Array
  *
  * Returns an array of tag Strings for this match.
@@ -196,7 +205,10 @@ static VALUE match_tags(VALUE self) {
   return mi->tags;
 }
 
-/* call-seq:
+/* 
+ * Document-method: strings
+ *
+ * call-seq:
  *      match.strings() -> Array
  *
  * Returns an array of MatchString objects for this match.
@@ -207,7 +219,10 @@ static VALUE match_strings(VALUE self) {
   return mi->strings;
 }
 
-/* call-seq:
+/* 
+ * Document-method: meta
+ *
+ * call-seq:
  *      match.meta() -> Hash
  *
  * Returns a hash of metadata for the match object.
@@ -260,16 +275,16 @@ static VALUE matchstring_buffer(VALUE self) {
   return ms->buffer;
 }
 
+void 
+init_Match() {
+  VALUE module_Yara = rb_define_module("Yara");
+
 /*
  * Document-class:  Match
  *
  * Encapsulates a match object returned from Yara::Rules#scan_string or Yara::Rules#scan_file.
  * A Match contains one or more MatchString objects.
  */
-
-void 
-init_Match() {
-  VALUE module_Yara = rb_define_module("Yara");
   class_Match = rb_define_class_under(module_Yara, "Match", rb_cObject);
   rb_define_method(class_Match, "rule", match_rule, 0);
   rb_define_method(class_Match, "namespace", match_namespace, 0);
@@ -277,8 +292,6 @@ init_Match() {
   rb_define_method(class_Match, "strings", match_strings, 0);
   rb_define_method(class_Match, "meta", match_meta, 0);
 
-  init_MatchString();
-}
 
 /*
  * Document-class:  MatchString
@@ -286,8 +299,6 @@ init_Match() {
  * Encapsulates an individual matched string location. One or more of these
  * will be available from a Match object.
  */
-void init_MatchString() {
-  VALUE module_Yara = rb_define_module("Yara");
   class_MatchString = rb_define_class_under(module_Yara, "MatchString", rb_cObject);
   rb_define_method(class_MatchString, "identifier", matchstring_identifier, 0);
   rb_define_method(class_MatchString, "offset", matchstring_offset, 0);
