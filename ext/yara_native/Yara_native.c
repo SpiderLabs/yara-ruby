@@ -23,7 +23,9 @@
 
 #include "Yara_native.h"
 #include "Rules.h"
-#include "errors.h"
+
+VALUE error_CompileError = Qnil;
+VALUE error_ScanError = Qnil;
 
 static VALUE module_Yara = Qnil;
 
@@ -32,7 +34,9 @@ void Init_yara_native() {
 
   module_Yara = rb_define_module("Yara");
 
-  init_errors(module_Yara);
+  error_CompileError = rb_define_class_under(module_Yara, "CompileError", rb_eStandardError);
+  error_ScanError = rb_define_class_under(module_Yara, "ScanError", rb_eStandardError);
+
   init_rules(module_Yara);
 }
 

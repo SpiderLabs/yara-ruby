@@ -28,5 +28,6 @@ unless have_library("yara") and
   raise "You must install the yara library"
 end
 
+create_header
 create_makefile(extension_name)
 

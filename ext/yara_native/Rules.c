@@ -18,11 +18,12 @@
  *  
 */
 
-#include "errors.h"
 #include "Rules.h"
 #include "Match.h"
 #include <stdio.h>
 
+extern VALUE error_CompileError;
+extern VALUE error_ScanError;
 static VALUE class_Rules = Qnil;
 
 void rules_mark(YARA_CONTEXT *ctx) { }
