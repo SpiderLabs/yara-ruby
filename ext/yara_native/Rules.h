@@ -24,8 +24,6 @@
 #include <yara.h>
 #include "ruby.h"
 
-static VALUE class_Rules;
-
-void init_rules(VALUE ruby_namespace);
+void init_Rules();
 
 #endif

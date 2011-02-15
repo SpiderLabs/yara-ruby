@@ -57,6 +57,6 @@ Rake::RDocTask.new do |rd|
   rd.main = "README.rdoc"
   rd.rdoc_files.include [ 
     "README.rdoc", "History.txt", "LICENSE.txt", "VERSION", 
-    "lib/*", "lib/**/*", "ext/**/*.c" ]
+    "lib/**/*", "ext/**/*.c" ]
 end
 

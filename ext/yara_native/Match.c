@@ -18,11 +18,12 @@
  *  
 */
 
-#include "Match.h"
+#include "Yara_native.h"
 #include <strings.h>
 #include <stdlib.h>
 
 VALUE class_Match = Qnil;
+
 VALUE class_MatchString = Qnil;
 
 const char * SCAN_ERRORS[] = {
@@ -58,7 +59,6 @@ const char * SCAN_ERRORS[] = {
   "incorrect external variable type",
 };
 
-
 typedef struct {
   VALUE rule;
   VALUE namespace;
@@ -73,7 +73,7 @@ typedef struct {
   VALUE buffer;
 } match_string;
 
-VALUE 
+static VALUE 
 MatchString_NEW(int offset, char *ident, char *buf, size_t buflen) {
   match_string *ms;
 
@@ -163,80 +163,132 @@ Match_NEW_from_rule(RULE *rule, unsigned char *buffer, VALUE *match) {
   return 0;
 }
 
-VALUE match_rule(VALUE self) {
+/* call-seq:
+ *      match.rule() -> String
+ *
+ * Returns the rule identifier string for this match.
+ */
+static VALUE match_rule(VALUE self) {
   match_info *mi;
   Data_Get_Struct(self, match_info, mi);
   return mi->rule;
 }
 
-VALUE match_namespace(VALUE self) {
+/* call-seq:
+ *      match.namespace() -> String
+ *
+ * Returns the namespace for this match.
+ */
+static VALUE match_namespace(VALUE self) {
   match_info *mi;
   Data_Get_Struct(self, match_info, mi);
   return mi->namespace;
 }
 
-VALUE match_tags(VALUE self) {
+/* call-seq:
+ *      match.tags() -> Array
+ *
+ * Returns an array of tag Strings for this match.
+ */
+static VALUE match_tags(VALUE self) {
   match_info *mi;
   Data_Get_Struct(self, match_info, mi);
   return mi->tags;
 }
 
-VALUE match_strings(VALUE self) {
+/* call-seq:
+ *      match.strings() -> Array
+ *
+ * Returns an array of MatchString objects for this match.
+ */
+static VALUE match_strings(VALUE self) {
   match_info *mi;
   Data_Get_Struct(self, match_info, mi);
   return mi->strings;
 }
 
-VALUE match_meta(VALUE self) {
+/* call-seq:
+ *      match.meta() -> Hash
+ *
+ * Returns a hash of metadata for the match object.
+ */
+static VALUE match_meta(VALUE self) {
   match_info *mi;
   Data_Get_Struct(self, match_info, mi);
   return mi->meta;
 }
 
-/* call-seq:
- *      match.identifier -> String
+/* 
+ * Document-method: identifier
+ *
+ * call-seq:
+ *      matchstring.identifier() -> String
  *
  * Returns the identification label for the string.
  */
-VALUE matchstring_identifier(VALUE self) {
+static VALUE matchstring_identifier(VALUE self) {
   match_string *ms;
   Data_Get_Struct(self, match_string, ms);
   return ms->identifier;
 }
 
-/* call-seq:
- *      match.offset -> fixnum
+/* 
+ * Document-method: offset
+ *
+ * call-seq:
+ *      matchstring.offset() -> fixnum
  *
  * Returns the offset where the match occurred.
  */
-VALUE matchstring_offset(VALUE self) {
+static VALUE matchstring_offset(VALUE self) {
   match_string *ms;
   Data_Get_Struct(self, match_string, ms);
   return ms->offset;
 }
 
-/* call-seq:
- *      match.buffer -> String
+/* 
+ * Document-method: buffer
+ *
+ * call-seq:
+ *      matchstring.buffer() -> String
  *
  * Returns the data matched.
  */
-VALUE matchstring_buffer(VALUE self) {
+static VALUE matchstring_buffer(VALUE self) {
   match_string *ms;
   Data_Get_Struct(self, match_string, ms);
   return ms->buffer;
 }
 
+/*
+ * Document-class:  Match
+ *
+ * Encapsulates a match object returned from Yara::Rules#scan_string or Yara::Rules#scan_file.
+ * A Match contains one or more MatchString objects.
+ */
 
 void 
-init_match(VALUE rb_ns) {
-  class_Match = rb_define_class_under(rb_ns, "Match", rb_cObject);
+init_Match() {
+  VALUE module_Yara = rb_define_module("Yara");
+  class_Match = rb_define_class_under(module_Yara, "Match", rb_cObject);
   rb_define_method(class_Match, "rule", match_rule, 0);
   rb_define_method(class_Match, "namespace", match_namespace, 0);
   rb_define_method(class_Match, "tags", match_tags, 0);
   rb_define_method(class_Match, "strings", match_strings, 0);
   rb_define_method(class_Match, "meta", match_meta, 0);
 
-  class_MatchString = rb_define_class_under(rb_ns, "MatchString", rb_cObject);
+  init_MatchString();
+}
+
+/*
+ * Document-class:  MatchString
+ *
+ * Encapsulates an individual matched string location. One or more of these
+ * will be available from a Match object.
+ */
+void init_MatchString() {
+  VALUE module_Yara = rb_define_module("Yara");
+  class_MatchString = rb_define_class_under(module_Yara, "MatchString", rb_cObject);
   rb_define_method(class_MatchString, "identifier", matchstring_identifier, 0);
   rb_define_method(class_MatchString, "offset", matchstring_offset, 0);
   rb_define_method(class_MatchString, "buffer", matchstring_buffer, 0);

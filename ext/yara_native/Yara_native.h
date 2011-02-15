@@ -24,6 +24,7 @@
 #include "ruby.h"
 #include <yara.h>
 
-static VALUE module_Yara;
+extern VALUE error_CompileError;
+extern VALUE error_ScanError;
 
 #endif

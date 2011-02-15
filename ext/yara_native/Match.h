@@ -24,16 +24,12 @@
 #include "ruby.h"
 #include <yara.h>
 
-extern VALUE class_Match;
-extern VALUE class_MatchString;
-
-extern void 
-init_match(VALUE ruby_namespace);
-
 extern int
 Match_NEW_from_rule(RULE * rule, unsigned char * buffer, VALUE * match);
 
 extern const char * SCAN_ERRORS[];
+
+void init_Match();
 
 #define MAX_SCAN_ERROR 29
 

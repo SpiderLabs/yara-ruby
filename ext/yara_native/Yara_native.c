@@ -20,24 +20,25 @@
 
 #include "ruby.h"
 #include <yara.h>
-
-#include "Yara_native.h"
 #include "Rules.h"
+#include "Match.h"
 
+VALUE module_Yara = Qnil;
 VALUE error_CompileError = Qnil;
 VALUE error_ScanError = Qnil;
-
-static VALUE module_Yara = Qnil;
 
 void Init_yara_native() {
   yr_init();
 
   module_Yara = rb_define_module("Yara");
 
+  /* Class Yara::CompileError */
   error_CompileError = rb_define_class_under(module_Yara, "CompileError", rb_eStandardError);
+  /* Class Yara::ScanError */
   error_ScanError = rb_define_class_under(module_Yara, "ScanError", rb_eStandardError);
 
-  init_rules(module_Yara);
+  init_Rules();
+  init_Match();
 }
 
 

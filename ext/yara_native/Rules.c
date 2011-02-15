@@ -18,13 +18,11 @@
  *  
 */
 
-#include "Rules.h"
 #include "Match.h"
+#include "Yara_native.h"
 #include <stdio.h>
 
-extern VALUE error_CompileError;
-extern VALUE error_ScanError;
-static VALUE class_Rules = Qnil;
+VALUE class_Rules = Qnil;
 
 void rules_mark(YARA_CONTEXT *ctx) { }
 
@@ -205,9 +203,10 @@ VALUE rules_scan_string(VALUE self, VALUE rb_dat) {
   return results;
 }
 
-void init_rules(VALUE rb_ns) {
+void init_Rules() {
+  VALUE module_Yara = rb_define_module("Yara");
 
-  class_Rules = rb_define_class_under(rb_ns, "Rules", rb_cObject);
+  class_Rules = rb_define_class_under(module_Yara, "Rules", rb_cObject);
   rb_define_alloc_func(class_Rules, rules_allocate);
 
   rb_define_method(class_Rules, "compile_file", rules_compile_file, 1);
@@ -218,7 +217,5 @@ void init_rules(VALUE rb_ns) {
   rb_define_method(class_Rules, "set_namespace", rules_set_namespace, 1);
   rb_define_method(class_Rules, "scan_file", rules_scan_file, 1);
   rb_define_method(class_Rules, "scan_string", rules_scan_string, 1);
-
-  init_match(rb_ns);
 }
 
