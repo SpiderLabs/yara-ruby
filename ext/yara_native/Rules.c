@@ -36,6 +36,19 @@ VALUE rules_allocate(VALUE klass) {
   return Data_Wrap_Struct(klass, rules_mark, rules_free, ctx);
 }
 
+/* 
+ * Document-method: compile_file
+ *
+ * call-seq:
+ *      rules.compile_file(filename) -> nil
+ *
+ * Compiles rules taken from a file by its filename. This method
+ * can be called more than once using multiple rules strings and
+ * can be used in combination with compile_file.
+ *
+ * To avoid namespace conflicts, you can use set_namespace
+ * before compiling rules.
+ */
 VALUE rules_compile_file(VALUE self, VALUE rb_fname) {
   FILE * file;
   char * fname;
@@ -62,6 +75,19 @@ VALUE rules_compile_file(VALUE self, VALUE rb_fname) {
   }
 }
 
+/* 
+ * Document-method: compile_string
+ *
+ * call-seq:
+ *      rules.compile_string(rules_string) -> nil
+ *
+ * Compiles rules taken from a ruby string. This method
+ * can be called more than once using multiple rules strings
+ * and can be used in combination with compile_file.
+ *
+ * To avoid namespace conflicts, you can use set_namespace
+ * before compiling rules.
+ */
 VALUE rules_compile_string(VALUE self, VALUE rb_rules) {
   YARA_CONTEXT *ctx;
   char *rules;
@@ -79,13 +105,29 @@ VALUE rules_compile_string(VALUE self, VALUE rb_rules) {
   return Qtrue;
 }
 
+/* 
+ * Document-method: weight
+ *
+ * call-seq:
+ *      rules.weight() -> fixnum
+ *
+ * Returns a weight value for the compiled rules.
+ */
+
 VALUE rules_weight(VALUE self) {
   YARA_CONTEXT *ctx;
   Data_Get_Struct(self, YARA_CONTEXT, ctx);
   return INT2NUM(yr_calculate_rules_weight(ctx));
 }
 
-
+/* 
+ * Document-method: current_namespace
+ *
+ * call-seq:
+ *      rules.current_namespace() -> String
+ *
+ * Returns the name of the currently active namespace.
+ */
 VALUE rules_current_namespace(VALUE self) {
   YARA_CONTEXT *ctx;
   Data_Get_Struct(self, YARA_CONTEXT, ctx);
@@ -95,6 +137,14 @@ VALUE rules_current_namespace(VALUE self) {
     return Qnil;
 }
 
+/* 
+ * Document-method: namespaces
+ *
+ * call-seq:
+ *      rules.namespaces() -> Array
+ *
+ * Returns the namespaces available in this rules context.
+ */
 VALUE rules_namespaces(VALUE self) {
   YARA_CONTEXT *ctx;
   NAMESPACE *ns;
@@ -121,6 +171,18 @@ NAMESPACE * find_namespace(YARA_CONTEXT *ctx, const char *name) {
   return (NAMESPACE*) NULL;
 }
 
+/* 
+ * Document-method: set_namespace
+ *
+ * call-seq:
+ *      rules.set_namespace(name) -> nil
+ *
+ * Sets the current namespace to the given name. If the namespace
+ * does not yet exist it is added.
+ *
+ * To avoid namespace conflicts, you can use set_namespace
+ * before compiling rules.
+ */
 VALUE rules_set_namespace(VALUE self, VALUE rb_namespace) {
   YARA_CONTEXT *ctx;
   NAMESPACE *ns = NULL;
@@ -158,7 +220,15 @@ scan_callback(RULE *rule, unsigned char *buffer, unsigned int buffer_size, void 
   return match_ret;
 }
 
-
+/* 
+ * Document-method: scan_file
+ *
+ * call-seq:
+ *      rules.scan_file(filename) -> nil
+ *
+ * Scans a file using the compiled rules supplied
+ * with either compile_file or compile_string (or both).
+ */
 VALUE rules_scan_file(VALUE self, VALUE rb_fname) {
   YARA_CONTEXT *ctx;
   VALUE results;
@@ -180,6 +250,16 @@ VALUE rules_scan_file(VALUE self, VALUE rb_fname) {
   return results;
 }
 
+
+/* 
+ * Document-method: scan_file
+ *
+ * call-seq:
+ *      rules.scan_string(data) -> nil
+ *
+ * Scans a ruby string using the compiled rules supplied
+ * with either compile_file or compile_string (or both).
+ */
 VALUE rules_scan_string(VALUE self, VALUE rb_dat) {
   YARA_CONTEXT *ctx;
   VALUE results;
