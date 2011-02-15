@@ -193,18 +193,33 @@ VALUE match_meta(VALUE self) {
   return mi->meta;
 }
 
+/* call-seq:
+ *      match.identifier -> String
+ *
+ * Returns the identification label for the string.
+ */
 VALUE matchstring_identifier(VALUE self) {
   match_string *ms;
   Data_Get_Struct(self, match_string, ms);
   return ms->identifier;
 }
 
+/* call-seq:
+ *      match.offset -> fixnum
+ *
+ * Returns the offset where the match occurred.
+ */
 VALUE matchstring_offset(VALUE self) {
   match_string *ms;
   Data_Get_Struct(self, match_string, ms);
   return ms->offset;
 }
 
+/* call-seq:
+ *      match.buffer -> String
+ *
+ * Returns the data matched.
+ */
 VALUE matchstring_buffer(VALUE self) {
   match_string *ms;
   Data_Get_Struct(self, match_string, ms);
