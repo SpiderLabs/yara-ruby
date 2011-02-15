@@ -280,7 +280,7 @@ init_Match() {
   VALUE module_Yara = rb_define_module("Yara");
 
 /*
- * Document-class:  Match
+ * Document-class: Yara::Match
  *
  * Encapsulates a match object returned from Yara::Rules#scan_string or 
  * Yara::Rules#scan_file. A Match contains one or more MatchString objects.
@@ -294,7 +294,7 @@ init_Match() {
 
 
 /*
- * Document-class:  MatchString
+ * Document-class: Yara::MatchString
  *
  * Encapsulates an individual matched string location. One or more of these
  * will be available from a Match object.

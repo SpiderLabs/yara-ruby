@@ -284,7 +284,7 @@ VALUE rules_scan_string(VALUE self, VALUE rb_dat) {
 }
 
 /*
- * Document-class:  Rules
+ * Document-class: Yara::Rules
  *
  * Encapsulates a Yara context against which you can compile rules and
  * scan inputs.
