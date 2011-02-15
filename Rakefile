@@ -50,3 +50,13 @@ task :default => :spec
 
 require 'yard'
 YARD::Rake::YardocTask.new
+
+require 'rake/rdoctask'
+Rake::RDocTask.new do |rd|
+  rd.rdoc_dir = 'rdoc'
+  rd.main = "README.rdoc"
+  rd.rdoc_files.include [ 
+    "README.rdoc", "History.txt", "LICENSE.txt", "VERSION", 
+    "lib/*", "lib/**/*", "ext/**/*.c" ]
+end
+
