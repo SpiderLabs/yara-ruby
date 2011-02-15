@@ -283,6 +283,12 @@ VALUE rules_scan_string(VALUE self, VALUE rb_dat) {
   return results;
 }
 
+/*
+ * Document-class:  Rules
+ *
+ * Encapsulates a Yara context against which you can compile rules and
+ * scan inputs.
+ */
 void init_Rules() {
   VALUE module_Yara = rb_define_module("Yara");
 
