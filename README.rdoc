@@ -55,7 +55,7 @@ Install the yara ruby package from a gem:
 
 Or from the github package.
 
-    git clone https://github.com/emonti/yara-ruby.git
+    git clone https://github.com/SpiderLabs/yara-ruby.git
     cd yara-ruby
     rake compile
 
