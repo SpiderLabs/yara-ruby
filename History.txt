@@ -1,3 +1,7 @@
+== 1.4.3 / 2011-02-21
+  * Improved documentation and 'inspect' features for testing in IRB.
+  * Also may have fixed memory leaks with Match and MatchString objects.
+
 == 1.4.2 / 2011-02-17
   * Polished release version
 
