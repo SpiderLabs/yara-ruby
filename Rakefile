@@ -34,6 +34,10 @@ Rake::ExtensionTask.new("yara_native")
 
 CLEAN.include("lib/*.bundle")
 CLEAN.include("lib/*.so")
+CLEAN.include("tmp/")
+CLEAN.include("doc/")
+CLEAN.include("rdoc/")
+CLEAN.include("coverage/")
 
 require 'rspec/core'
 require 'rspec/core/rake_task'
