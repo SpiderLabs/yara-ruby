@@ -288,7 +288,7 @@ VALUE rules_scan_string(VALUE self, VALUE rb_dat) {
   YARA_CONTEXT *ctx;
   VALUE results;
   char *buf;
-  long buflen;
+  size_t buflen;
   int ret;
 
   Check_Type(rb_dat, T_STRING);
