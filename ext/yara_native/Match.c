@@ -76,22 +76,28 @@ typedef struct {
 static VALUE 
 MatchString_NEW(int offset, char *ident, char *buf, size_t buflen) {
   match_string *ms;
+  VALUE rb_ms = Qnil;
 
   ms = (match_string *) malloc(sizeof(match_string));
 
   if (! ms)
-    rb_raise(rb_eNoMemError, "Can't allocate MatchString");
+    rb_sys_fail("Can't allocate MatchString");
 
-  ms->offset      = INT2NUM(offset);
-  ms->identifier  = rb_obj_freeze(rb_str_new2(ident));
-  ms->buffer      = rb_obj_freeze(rb_str_new(buf, buflen));
+  rb_ms = Data_Wrap_Struct(class_MatchString, 0, free, ms);
 
-  return rb_obj_freeze(Data_Wrap_Struct(class_MatchString, 0, free, ms));
+  ms->offset      = rb_iv_set(rb_ms, "@offset", INT2NUM(offset));
+  ms->identifier  = rb_iv_set(rb_ms, "@identifier", 
+                      rb_obj_freeze(rb_str_new2(ident)));
+  ms->buffer      = rb_iv_set(rb_ms, "@buffer", 
+                      rb_obj_freeze(rb_str_new(buf, buflen)));
+
+  return rb_obj_freeze(rb_ms);
 }
 
 int 
 Match_NEW_from_rule(RULE *rule, unsigned char *buffer, VALUE *match) {
   match_info *mi;
+  VALUE rb_mi = Qnil;
 
   TAG *tag;
   STRING *string;
@@ -105,11 +111,13 @@ Match_NEW_from_rule(RULE *rule, unsigned char *buffer, VALUE *match) {
   if (! mi )
     return 1;
 
-  mi->rule      = rb_obj_freeze(rb_str_new2(rule->identifier));
-  mi->namespace = rb_obj_freeze(rb_str_new2(rule->namespace->name));
-  mi->tags      = rb_ary_new();
-  mi->strings   = rb_ary_new();
-  mi->meta      = rb_hash_new();
+  rb_mi = Data_Wrap_Struct(class_Match, 0, free, mi);
+
+  mi->rule      = rb_iv_set(rb_mi, "@rule", rb_obj_freeze(rb_str_new2(rule->identifier)));
+  mi->namespace = rb_iv_set(rb_mi, "@namespace", rb_obj_freeze(rb_str_new2(rule->namespace->name)));
+  mi->tags      = rb_iv_set(rb_mi, "@tags", rb_ary_new());
+  mi->strings   = rb_iv_set(rb_mi, "@strings", rb_ary_new());
+  mi->meta      = rb_iv_set(rb_mi, "@meta", rb_hash_new());
 
   tag = rule->tag_list_head;
   while (tag) {
@@ -158,7 +166,7 @@ Match_NEW_from_rule(RULE *rule, unsigned char *buffer, VALUE *match) {
   }
   rb_obj_freeze(mi->meta);
 
-  *(match) = rb_obj_freeze(Data_Wrap_Struct(class_Match, 0, free, mi));
+  *(match) = rb_obj_freeze(rb_mi);
 
   return 0;
 }
