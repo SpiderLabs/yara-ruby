@@ -30,10 +30,6 @@ module Yara
         :strings => self.strings }
     end
 
-    def inspect
-      h=to_hash
-      h.inspect
-    end
   end
 
   class MatchString
@@ -52,10 +48,6 @@ module Yara
       { :offset => self.offset, :identifier => self.ident, :buffer => self.buffer}
     end
 
-    def inspect
-      h=to_a
-      h.inspect
-    end
   end
 
 end
