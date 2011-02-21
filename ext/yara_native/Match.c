@@ -169,7 +169,7 @@ Match_NEW_from_rule(RULE *rule, unsigned char *buffer, VALUE *match) {
  * call-seq:
  *      match.rule() -> String
  *
- * Returns the rule identifier string for this match.
+ * @return String The rule identifier string for this match.
  */
 static VALUE match_rule(VALUE self) {
   match_info *mi;
@@ -183,7 +183,7 @@ static VALUE match_rule(VALUE self) {
  * call-seq:
  *      match.namespace() -> String
  *
- * Returns the namespace for this match.
+ * @return String The namespace for this match.
  */
 static VALUE match_namespace(VALUE self) {
   match_info *mi;
@@ -197,7 +197,7 @@ static VALUE match_namespace(VALUE self) {
  * call-seq:
  *      match.tags() -> Array
  *
- * Returns an array of tag Strings for this match.
+ * @return [String]   An array of tags for this match.
  */
 static VALUE match_tags(VALUE self) {
   match_info *mi;
@@ -211,7 +211,7 @@ static VALUE match_tags(VALUE self) {
  * call-seq:
  *      match.strings() -> Array
  *
- * Returns an array of MatchString objects for this match.
+ * @return [Yara::MatchString]   An array of MatchString objects for this match.
  */
 static VALUE match_strings(VALUE self) {
   match_info *mi;
@@ -225,7 +225,7 @@ static VALUE match_strings(VALUE self) {
  * call-seq:
  *      match.meta() -> Hash
  *
- * Returns a hash of metadata for the match object.
+ * @return Hash   Keyed values of metadata for the match object.
  */
 static VALUE match_meta(VALUE self) {
   match_info *mi;
@@ -239,7 +239,7 @@ static VALUE match_meta(VALUE self) {
  * call-seq:
  *      matchstring.identifier() -> String
  *
- * Returns the identification label for the string.
+ * @return String   The identification label for the string.
  */
 static VALUE matchstring_identifier(VALUE self) {
   match_string *ms;
@@ -251,9 +251,9 @@ static VALUE matchstring_identifier(VALUE self) {
  * Document-method: offset
  *
  * call-seq:
- *      matchstring.offset() -> fixnum
+ *      matchstring.offset() -> Fixnum
  *
- * Returns the offset where the match occurred.
+ * @return Fixnum   The offset where the match occurred.
  */
 static VALUE matchstring_offset(VALUE self) {
   match_string *ms;
@@ -267,7 +267,7 @@ static VALUE matchstring_offset(VALUE self) {
  * call-seq:
  *      matchstring.buffer() -> String
  *
- * Returns the data matched.
+ * @return String   The data matched in the buffer.
  */
 static VALUE matchstring_buffer(VALUE self) {
   match_string *ms;
