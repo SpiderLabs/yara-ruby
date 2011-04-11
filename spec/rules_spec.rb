@@ -213,6 +213,7 @@ describe Yara::Rules do
 
     end
 
+
     it "should raise an error if scanning an invalid string" do
       @rules.compile_file(sample_file("packers.yara"))
       @rules.weight.should > 0
@@ -220,6 +221,96 @@ describe Yara::Rules do
       lambda { @rules.scan_string(nil)}.should raise_error(TypeError)
     end
 
+
+    it "should take an optional namespace when compiling a file" do
+      @rules.compile_file(sample_file("packers.yara"), "an_optional_namespace1" )
+      @rules.weight.should > 0
+      results = @rules.scan_file(sample_file("DumpMem.exe"))
+      results.should be_kind_of(Array)
+      results.size.should == 1
+
+      m = results.first
+      m.should be_kind_of(Yara::Match)
+      m.should be_frozen
+
+      m.rule.should == "UPX"
+
+      m.namespace.should == "an_optional_namespace1"
+      m.namespace.should be_frozen
+
+      @rules.namespaces.should == ["an_optional_namespace1", "default"]
+      @rules.current_namespace.should == "default"
+    end
+
+    it "should allow the 'default' namespace when compiling a file" do
+      @rules.compile_file(sample_file("packers.yara"), "default" )
+      @rules.weight.should > 0
+      results = @rules.scan_file(sample_file("DumpMem.exe"))
+      results.should be_kind_of(Array)
+      results.size.should == 1
+
+      m = results.first
+      m.should be_kind_of(Yara::Match)
+      m.should be_frozen
+
+      m.rule.should == "UPX"
+
+      m.namespace.should == "default"
+      m.namespace.should be_frozen
+
+      @rules.namespaces.should == ["default"]
+      @rules.current_namespace.should == "default"
+    end
+
+    it "should raise an error when compiling a file with an invalid namespace" do
+      lambda { @rules.compile_file(sample_file("packers.yara"), 1) }.should raise_error(TypeError)
+    end
+
+
+    it "should take an optional namespace when compiling a string" do
+      @rules.compile_string(File.read(sample_file("packers.yara")), "an_optional_namespace2")
+      @rules.weight.should > 0
+      results = @rules.scan_file(sample_file("DumpMem.exe"))
+      results.should be_kind_of(Array)
+      results.size.should == 1
+
+      m = results.first
+      m.should be_kind_of(Yara::Match)
+      m.should be_frozen
+
+      m.rule.should == "UPX"
+
+      m.namespace.should == "an_optional_namespace2"
+      m.namespace.should be_frozen
+
+      @rules.namespaces.should == ["an_optional_namespace2", "default"]
+      @rules.current_namespace.should == "default"
+    end
+
+    it "should allow the 'default' namespace when compiling a string" do
+      @rules.compile_string(File.read(sample_file("packers.yara")), "default")
+      @rules.weight.should > 0
+      results = @rules.scan_file(sample_file("DumpMem.exe"))
+      results.should be_kind_of(Array)
+      results.size.should == 1
+
+      m = results.first
+      m.should be_kind_of(Yara::Match)
+      m.should be_frozen
+
+      m.rule.should == "UPX"
+
+      m.namespace.should == "default"
+      m.namespace.should be_frozen
+
+      @rules.namespaces.should == ["default"]
+      @rules.current_namespace.should == "default"
+    end
+
+
+    it "should raise an error when compiling a string with an invalid namespace" do
+      lambda { @rules.compile_string(File.read(sample_file("packers.yara")), 1) }.should raise_error(TypeError)
+    end
 
   end
 end
