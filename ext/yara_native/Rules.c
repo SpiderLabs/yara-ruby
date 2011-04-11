@@ -36,11 +36,25 @@ VALUE rules_allocate(VALUE klass) {
   return Data_Wrap_Struct(klass, rules_mark, rules_free, ctx);
 }
 
+/* used internally to lookup namespaces */
+NAMESPACE * find_namespace(YARA_CONTEXT *ctx, const char *name) {
+  NAMESPACE *ns = ctx->namespaces;
+
+  while(ns && ns->name) {
+    if(strcmp(name, ns->name) == 0)
+      return(ns);
+    else
+      ns = ns->next;
+  }
+  return (NAMESPACE*) NULL;
+}
+
+
 /* 
  * Document-method: compile_file
  *
  * call-seq:
- *      rules.compile_file(filename) -> nil
+ *      rules.compile_file(filename, ns=nil) -> nil
  *
  * Compiles rules taken from a file by its filename. This method
  * can be called more than once using multiple rules strings and
@@ -49,23 +63,44 @@ VALUE rules_allocate(VALUE klass) {
  * To avoid namespace conflicts, you can use set_namespace
  * before compiling rules.
  *
- * @param String filename The name of a yara rules file to compile.
+ * @param String     filename  The name of a yara rules file to compile.
+ * @param String,nil ns        Optional namespace for the rules.
  *
  * @raise Yara::CompileError An exception is raised if a compile error occurs.
  */
-VALUE rules_compile_file(VALUE self, VALUE rb_fname) {
-  FILE * file;
-  char * fname;
+VALUE rules_compile_file(int argc, VALUE *argv, VALUE self) {
+  FILE *file;
+  char *fname;
   YARA_CONTEXT *ctx;
   char error_message[256];
+  NAMESPACE *orig_ns, *ns;
+
+  VALUE rb_fname;
+  VALUE rb_ns;
+
+  orig_ns = ns = NULL;
+
+  rb_scan_args(argc, argv, "11", &rb_fname, &rb_ns);
 
   Check_Type(rb_fname, T_STRING);
-  fname = RSTRING_PTR(rb_fname);
 
+  if(rb_ns != Qnil) {
+    Check_Type(rb_ns, T_STRING);
+  }
+
+  fname = RSTRING_PTR(rb_fname);
   if( !(file=fopen(fname, "r")) ) {
     rb_raise(error_CompileError, "No such file: %s", fname);
   } else {
     Data_Get_Struct(self, YARA_CONTEXT, ctx);
+
+    if((rb_ns != Qnil) && (orig_ns = ctx->current_namespace)) {
+
+      if (!(ns = find_namespace(ctx, RSTRING_PTR(rb_ns))))
+        ns = yr_create_namespace(ctx, RSTRING_PTR(rb_ns));
+
+      ctx->current_namespace = ns;
+    }
 
     if( yr_compile_file(file, ctx) != 0 ) {
       yr_get_error_message(ctx, error_message, sizeof(error_message));
@@ -74,7 +109,12 @@ VALUE rules_compile_file(VALUE self, VALUE rb_fname) {
     }
 
     yr_push_file_name(ctx, fname);
+
+    if ( orig_ns )
+      ctx->current_namespace = orig_ns;
+
     fclose(file);
+
     return Qtrue;
   }
 }
@@ -83,32 +123,56 @@ VALUE rules_compile_file(VALUE self, VALUE rb_fname) {
  * Document-method: compile_string
  *
  * call-seq:
- *      rules.compile_string(rules_string) -> nil
+ *      rules.compile_string(rules_string, ns=nil) -> nil
  *
  * Compiles rules taken from a ruby string. This method
  * can be called more than once using multiple rules strings
  * and can be used in combination with compile_file.
  *
- * To avoid namespace conflicts, you can use set_namespace
- * before compiling rules.
+ * To avoid namespace conflicts, you can set a namespace using
+ * the optional 'ns' argument.
  *
- * @param String rules_string A string containing yara rules text.
+ * @param String     rules_string   A string containing yara rules text.
+ * @param String,nil ns             An optional namespace for the rules.
  *
  * @raise Yara::CompileError An exception is raised if a compile error occurs.
  */
-VALUE rules_compile_string(VALUE self, VALUE rb_rules) {
+VALUE rules_compile_string(int argc, VALUE *argv, VALUE self) {
   YARA_CONTEXT *ctx;
   char *rules;
   char error_message[256];
+  NAMESPACE *orig_ns, *ns;
+
+  VALUE rb_rules;
+  VALUE rb_ns;
+
+  orig_ns = ns = NULL;
+
+  rb_scan_args(argc, argv, "11", &rb_rules, &rb_ns);
 
   Check_Type(rb_rules, T_STRING);
+  if (rb_ns != Qnil)
+    Check_Type(rb_ns, T_STRING);
+
   rules = RSTRING_PTR(rb_rules);
   Data_Get_Struct(self, YARA_CONTEXT, ctx);
+
+  if((rb_ns != Qnil) && (orig_ns = ctx->current_namespace)) {
+    orig_ns = ctx->current_namespace;
+
+    if (!(ns = find_namespace(ctx, RSTRING_PTR(rb_ns))))
+      ns = yr_create_namespace(ctx, RSTRING_PTR(rb_ns));
+
+    ctx->current_namespace = ns;
+  }
 
   if( yr_compile_string(rules, ctx) != 0) {
       yr_get_error_message(ctx, error_message, sizeof(error_message));
       rb_raise(error_CompileError, "Syntax Error - line(%d): %s", ctx->last_error_line, error_message);
   }
+
+  if ( orig_ns )
+    ctx->current_namespace = orig_ns;
 
   return Qtrue;
 }
@@ -166,18 +230,6 @@ VALUE rules_namespaces(VALUE self) {
     ns = ns->next;
   }
   return ary;
-}
-
-NAMESPACE * find_namespace(YARA_CONTEXT *ctx, const char *name) {
-  NAMESPACE *ns = ctx->namespaces;
-
-  while(ns && ns->name) {
-    if(strcmp(name, ns->name) == 0)
-      return(ns);
-    else
-      ns = ns->next;
-  }
-  return (NAMESPACE*) NULL;
 }
 
 /* 
@@ -319,8 +371,8 @@ void init_Rules() {
   class_Rules = rb_define_class_under(module_Yara, "Rules", rb_cObject);
   rb_define_alloc_func(class_Rules, rules_allocate);
 
-  rb_define_method(class_Rules, "compile_file", rules_compile_file, 1);
-  rb_define_method(class_Rules, "compile_string", rules_compile_string, 1);
+  rb_define_method(class_Rules, "compile_file", rules_compile_file, -1);
+  rb_define_method(class_Rules, "compile_string", rules_compile_string, -1);
   rb_define_method(class_Rules, "weight", rules_weight, 0);
   rb_define_method(class_Rules, "current_namespace", rules_current_namespace, 0);
   rb_define_method(class_Rules, "namespaces", rules_namespaces, 0);
