@@ -51,8 +51,6 @@ NAMESPACE * find_namespace(YARA_CONTEXT *ctx, const char *name) {
 
 
 /* 
- * Document-method: compile_file
- *
  * call-seq:
  *      rules.compile_file(filename, ns=nil) -> nil
  *
@@ -63,10 +61,11 @@ NAMESPACE * find_namespace(YARA_CONTEXT *ctx, const char *name) {
  * To avoid namespace conflicts, you can use set_namespace
  * before compiling rules.
  *
- * @param String     filename  The name of a yara rules file to compile.
- * @param String,nil ns        Optional namespace for the rules.
+ * @param [String]     filename  The name of a yara rules file to compile.
  *
- * @raise Yara::CompileError An exception is raised if a compile error occurs.
+ * @param [String,nil] ns        Optional namespace for the rules.
+ *
+ * @raise [Yara::CompileError] An exception is raised if a compile error occurs.
  */
 VALUE rules_compile_file(int argc, VALUE *argv, VALUE self) {
   FILE *file;
@@ -120,8 +119,6 @@ VALUE rules_compile_file(int argc, VALUE *argv, VALUE self) {
 }
 
 /* 
- * Document-method: compile_string
- *
  * call-seq:
  *      rules.compile_string(rules_string, ns=nil) -> nil
  *
@@ -132,10 +129,11 @@ VALUE rules_compile_file(int argc, VALUE *argv, VALUE self) {
  * To avoid namespace conflicts, you can set a namespace using
  * the optional 'ns' argument.
  *
- * @param String     rules_string   A string containing yara rules text.
- * @param String,nil ns             An optional namespace for the rules.
+ * @param [String] rules_string   A string containing yara rules text.
  *
- * @raise Yara::CompileError An exception is raised if a compile error occurs.
+ * @param [String,nil] ns         An optional namespace for the rules.
+ *
+ * @raise [Yara::CompileError] An exception is raised if a compile error occurs.
  */
 VALUE rules_compile_string(int argc, VALUE *argv, VALUE self) {
   YARA_CONTEXT *ctx;
@@ -178,8 +176,6 @@ VALUE rules_compile_string(int argc, VALUE *argv, VALUE self) {
 }
 
 /* 
- * Document-method: weight
- *
  * call-seq:
  *      rules.weight() -> Fixnum
  *
@@ -194,8 +190,6 @@ VALUE rules_weight(VALUE self) {
 }
 
 /* 
- * Document-method: current_namespace
- *
  * call-seq:
  *      rules.current_namespace() -> String
  *
@@ -211,8 +205,6 @@ VALUE rules_current_namespace(VALUE self) {
 }
 
 /* 
- * Document-method: namespaces
- *
  * call-seq:
  *      rules.namespaces() -> Array
  *
@@ -233,8 +225,6 @@ VALUE rules_namespaces(VALUE self) {
 }
 
 /* 
- * Document-method: set_namespace
- *
  * call-seq:
  *      rules.set_namespace(name) -> nil
  *
@@ -244,7 +234,7 @@ VALUE rules_namespaces(VALUE self) {
  * To avoid namespace conflicts, you can use set_namespace
  * before compiling rules.
  *
- * @param String name The namespace to set.
+ * @param [String] name The namespace to set.
  */
 VALUE rules_set_namespace(VALUE self, VALUE rb_namespace) {
   YARA_CONTEXT *ctx;
@@ -285,19 +275,17 @@ scan_callback(RULE *rule, unsigned char *buffer, unsigned int buffer_size, void 
 }
 
 /* 
- * Document-method: scan_file
- *
  * call-seq:
  *      rules.scan_file(filename) -> Array
  *
  * Scans a file using the compiled rules supplied
  * with either compile_file or compile_string (or both).
  *
- * @param String filename The name of a file to scan with yara.
+ * @param [String] filename The name of a file to scan with yara.
  *
  * @return [Yara::Match] An array of Yara::Match objects found in the file.
  *
- * @raise Yara::ScanError Raised if an error occurs while scanning the file.
+ * @raise [Yara::ScanError] Raised if an error occurs while scanning the file.
  */
 VALUE rules_scan_file(VALUE self, VALUE rb_fname) {
   YARA_CONTEXT *ctx;
@@ -322,19 +310,17 @@ VALUE rules_scan_file(VALUE self, VALUE rb_fname) {
 
 
 /* 
- * Document-method: scan_file
- *
  * call-seq:
  *      rules.scan_string(buf) -> Array
  *
  * Scans a ruby string using the compiled rules supplied
  * with either compile_file or compile_string (or both).
  *
- * @param String buf The string buffer to scan with yara.
+ * @param [String] buf The string buffer to scan with yara.
  *
  * @return [Yara::Match] An array of Yara::Match objects found in the string.
  *
- * @raise Yara::ScanError Raised if an error occurs while scanning the string.
+ * @raise [Yara::ScanError] Raised if an error occurs while scanning the string.
  */
 VALUE rules_scan_string(VALUE self, VALUE rb_dat) {
   YARA_CONTEXT *ctx;
