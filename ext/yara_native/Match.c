@@ -177,7 +177,7 @@ Match_NEW_from_rule(RULE *rule, unsigned char *buffer, VALUE *match) {
  * call-seq:
  *      match.rule() -> String
  *
- * @return String The rule identifier string for this match.
+ * @return [String] The rule identifier string for this match.
  */
 static VALUE match_rule(VALUE self) {
   match_info *mi;
@@ -191,7 +191,7 @@ static VALUE match_rule(VALUE self) {
  * call-seq:
  *      match.namespace() -> String
  *
- * @return String The namespace for this match.
+ * @return [String] The namespace for this match.
  */
 static VALUE match_namespace(VALUE self) {
   match_info *mi;
@@ -233,7 +233,7 @@ static VALUE match_strings(VALUE self) {
  * call-seq:
  *      match.meta() -> Hash
  *
- * @return Hash   Keyed values of metadata for the match object.
+ * @return [Hash]   Keyed values of metadata for the match object.
  */
 static VALUE match_meta(VALUE self) {
   match_info *mi;
@@ -247,7 +247,7 @@ static VALUE match_meta(VALUE self) {
  * call-seq:
  *      matchstring.identifier() -> String
  *
- * @return String   The identification label for the string.
+ * @return [String]   The identification label for the string.
  */
 static VALUE matchstring_identifier(VALUE self) {
   match_string *ms;
@@ -261,7 +261,7 @@ static VALUE matchstring_identifier(VALUE self) {
  * call-seq:
  *      matchstring.offset() -> Fixnum
  *
- * @return Fixnum   The offset where the match occurred.
+ * @return [Fixnum]   The offset where the match occurred.
  */
 static VALUE matchstring_offset(VALUE self) {
   match_string *ms;
@@ -275,7 +275,7 @@ static VALUE matchstring_offset(VALUE self) {
  * call-seq:
  *      matchstring.buffer() -> String
  *
- * @return String   The data matched in the buffer.
+ * @return [String]   The data matched in the buffer.
  */
 static VALUE matchstring_buffer(VALUE self) {
   match_string *ms;
