@@ -1,3 +1,6 @@
+== 1.4.3 / 2011-04-11
+  * Support optional namespaces when calling compile_file or compile_string
+
 == 1.4.3 / 2011-02-21
   * Improved documentation 
   * More intuitive 'inspect' features for testing in IRB.
