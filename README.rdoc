@@ -34,15 +34,19 @@ http://code.google.com/p/yara-project/
   end
 
 == Versioning
-The current version of libyara at the time of writing is 1.4.0. Bindings
+The current version of libyara at the time of writing is 1.5.0. Bindings
 have been written against this API and may not work with earlier versions
 of the libyara library.
 
 The major and minor version numbers of the ruby library are intended
 to be in step with the C api version.
 
+Note that yara-ruby began existence as of yara 1.4 so binding versions
+go back this far. The yara 1.4 binding in ruby to use is the most recent
+1.4.X gem, and so on.
+
 == Requirements
-* libyara 1.4 must be installed - http://code.google.com/p/yara-project/
+* libyara 1.5 must be installed - http://code.google.com/p/yara-project/
 
 == Installation
 
