@@ -57,6 +57,9 @@ const char * SCAN_ERRORS[] = {
   "duplicate meta identifier",
   "includes circular reference",
   "incorrect external variable type",
+  "could not attach to process",
+  "vector too long",
+  "include depth exceeded"
 };
 
 typedef struct {

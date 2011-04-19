@@ -31,7 +31,7 @@ extern const char * SCAN_ERRORS[];
 
 void init_Match();
 
-#define MAX_SCAN_ERROR 29
+#define MAX_SCAN_ERROR 32
 
 #endif
 
