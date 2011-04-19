@@ -95,7 +95,7 @@ MatchString_NEW(int offset, char *ident, char *buf, size_t buflen) {
 }
 
 int 
-Match_NEW_from_rule(RULE *rule, unsigned char *buffer, VALUE *match) {
+Match_NEW_from_rule(RULE *rule, VALUE *match) {
   match_info *mi;
   VALUE rb_mi = Qnil;
 
@@ -114,7 +114,7 @@ Match_NEW_from_rule(RULE *rule, unsigned char *buffer, VALUE *match) {
   rb_mi = Data_Wrap_Struct(class_Match, 0, free, mi);
 
   mi->rule      = rb_iv_set(rb_mi, "@rule", rb_obj_freeze(rb_str_new2(rule->identifier)));
-  mi->namespace = rb_iv_set(rb_mi, "@namespace", rb_obj_freeze(rb_str_new2(rule->namespace->name)));
+  mi->namespace = rb_iv_set(rb_mi, "@namespace", rb_obj_freeze(rb_str_new2(rule->ns->name)));
   mi->tags      = rb_iv_set(rb_mi, "@tags", rb_ary_new());
   mi->strings   = rb_iv_set(rb_mi, "@strings", rb_ary_new());
   mi->meta      = rb_iv_set(rb_mi, "@meta", rb_hash_new());
@@ -130,12 +130,12 @@ Match_NEW_from_rule(RULE *rule, unsigned char *buffer, VALUE *match) {
   string = rule->string_list_head;
   while(string) {
     if (string->flags & STRING_FLAGS_FOUND) {
-      m = string->matches;
+      m = string->matches_head;
       while (m) {
        rb_ary_push(mi->strings, 
            MatchString_NEW(m->offset, 
              string->identifier, 
-             buffer + m->offset, 
+             m->data, 
              m->length));
         m = m->next;
       }

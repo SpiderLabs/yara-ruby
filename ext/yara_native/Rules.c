@@ -260,14 +260,14 @@ VALUE rules_set_namespace(VALUE self, VALUE rb_namespace) {
 
 /* an internal callback function used with scan_file and scan_string */
 static int 
-scan_callback(RULE *rule, unsigned char *buffer, unsigned int buffer_size, void *data) {
+scan_callback(RULE *rule, void *data) {
   int match_ret;
   VALUE match = Qnil;
   VALUE results = *((VALUE *) data);
 
   Check_Type(results, T_ARRAY);
 
-  match_ret = Match_NEW_from_rule(rule, buffer, &match);
+  match_ret = Match_NEW_from_rule(rule, &match);
   if(match_ret == 0 && !NIL_P(match))
     rb_ary_push(results,match);
 

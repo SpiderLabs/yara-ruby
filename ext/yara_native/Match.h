@@ -25,7 +25,7 @@
 #include <yara.h>
 
 extern int
-Match_NEW_from_rule(RULE * rule, unsigned char * buffer, VALUE * match);
+Match_NEW_from_rule(RULE * rule, VALUE * match);
 
 extern const char * SCAN_ERRORS[];
 

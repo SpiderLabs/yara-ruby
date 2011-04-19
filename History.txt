@@ -1,3 +1,6 @@
+== 1.5.0 /2011-04-18
+  * Version 1.5.0 supports yara 1.5 - it is not backward compatible
+
 == 1.4.3 / 2011-04-11
   * Support optional namespaces when calling compile_file or compile_string
   * Better yardoc tags
