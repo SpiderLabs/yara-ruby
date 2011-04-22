@@ -1,0 +1,70 @@
+#!/usr/bin/env ruby
+# Simple yara-ruby script to extract SWF files from raw blobs
+#
+#    yara-ruby - Ruby bindings for the yara malware analysis library.
+#    Eric Monti
+#    Copyright (C) 2011 Trustwave Holdings
+#
+#    This program is free software: you can redistribute it and/or modify it 
+#    under the terms of the GNU General Public License as published by the 
+#    Free Software Foundation, either version 3 of the License, or (at your
+#    option) any later version.
+#
+#    This program is distributed in the hope that it will be useful, but 
+#    WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+#    or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+#    for more details.
+#
+#    You should have received a copy of the GNU General Public License along
+#    with this program. If not, see <http://www.gnu.org/licenses/>.
+#
+$: << File.join(File.dirname(__FILE__), '..', 'lib')
+require 'yara'
+require 'pp'
+
+ctx = Yara::Rules.new
+ctx.compile_string <<_EOF_
+rule fws 
+{
+  meta:
+    desc = "SWF file"
+    ext = "swf"
+  strings: $a = { 46 57 53 }
+  condition: $a
+}
+
+rule cws 
+{
+  meta:
+    desc = "Compressed SWF file"
+    ext = "swf"
+  strings: $a = { 43 57 53 }
+  condition: $a
+}
+
+_EOF_
+
+
+ARGV.each do |fname|
+  begin
+    file = File.new(fname, 'rb')
+    ctx.scan_file(fname).each do |match|
+      match.strings.each do |string|
+        file.pos = string.offset
+        hdr = file.read(8)
+
+        magic, vers, len = hdr.unpack("A3CV")
+
+        outf = "#{fname}_%0.8x.#{match.meta['ext']}" % string.offset
+        STDERR.puts "Found #{match.meta['desc']} version #{vers} in #{fname.inspect} @0x#{string.offset.to_s(16)} - writing to #{outf.inspect}"
+
+        File.open(outf, 'wb') do |out|
+          out.write hdr 
+          out.write file.read(len-8)
+        end
+      end
+    end
+  ensure
+    file.close if file
+  end
+end
