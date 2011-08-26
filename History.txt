@@ -1,3 +1,8 @@
+== 1.6.0 /2011-08-26
+  * Version 1.6.0 supports yara 1.6 - (backward compatible with yara v1.5)
+  * Note: Nothing actually changed in the API for yara 1.6, we are just keeping
+    step with yara's version numbers.
+
 == 1.5.0 /2011-04-18
   * Version 1.5.0 supports yara 1.5 - it is not backward compatible
 
